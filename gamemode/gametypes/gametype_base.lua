@@ -423,10 +423,10 @@ function GAMETYPE:InitSettings()
 
     GAMEMODE:AddSetting("checkpoint_respawn", {
         Category = "SERVER",
-        NiceName = "#GM_CHECKPOINT_RESPAWN",
-        Description = "#GM_CHECKPOINT_RESPAWN_DESC",
+        NiceName = "#GM_SURVIVALMODE",
+        Description = "#GM_SURVIVALMODE_DESC",
         Type = "bool",
-        Default = false,
+        Default = true,
         Flags = bit.bor(0, FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED),
     })
 
