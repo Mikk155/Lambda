@@ -9,12 +9,12 @@ MAPSCRIPT.DefaultLoadout = {
     Weapons = {"weapon_lambda_medkit", "weapon_crowbar", "weapon_pistol", "weapon_smg1", "weapon_357", "weapon_physcannon", "weapon_shotgun", "weapon_ar2"},
     --"weapon_frag",
     Ammo = {
-        ["Pistol"] = 20,
-        ["SMG1"] = 45,
-        ["357"] = 6,
-        --["Grenade"] = 3,
+        ["Pistol"] = 118,
+        ["SMG1"] = 90,
+        ["357"] = 12,
+        ["Grenade"] = 3,
         ["Buckshot"] = 12,
-        ["AR2"] = 50
+        ["AR2"] = 60
     },
     Armor = 60,
     HEV = true

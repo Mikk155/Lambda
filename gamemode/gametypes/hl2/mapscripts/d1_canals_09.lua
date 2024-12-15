@@ -8,8 +8,8 @@ MAPSCRIPT.PlayersLocked = false
 MAPSCRIPT.DefaultLoadout = {
     Weapons = {"weapon_lambda_medkit", "weapon_crowbar", "weapon_pistol", "weapon_smg1", "weapon_357"},
     Ammo = {
-        ["Pistol"] = 60,
-        ["SMG1"] = 60
+        ["Pistol"] = 118,
+        ["SMG1"] = 90
     },
     Armor = 0,
     HEV = true
