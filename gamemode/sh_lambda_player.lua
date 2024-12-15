@@ -1238,8 +1238,11 @@ end
 function GM:ShouldChargeSuitPower(ply)
     local sprinting = ply:GetLambdaSprinting()
     local inWater = ply:WaterLevel() >= 3
-    local powerDrain = sprinting or inWater --[[ or flashlightOn ]]
-    if powerDrain == true then -- Something is draning power.
+    --TODO Drain power if limitedflashlight true
+    local flashlightOn = ply:FlashlightIsOn()
+    local powerDrain = sprinting or inWater
+    local flashlightDrain =  GAMEMODE:GetSetting("limitedflashlight") and flashlightOn
+    if powerDrain == true or flashlightDrain == true then -- Something is draning power.
         return false
     end
 

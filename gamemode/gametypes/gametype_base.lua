@@ -381,6 +381,15 @@ function GAMETYPE:InitSettings()
         Flags = bit.bor(0, FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED)
     })
 
+    GAMEMODE:AddSetting("limitedflashlight", {
+        Category = "SERVER",
+        NiceName = "#GM_LIMITED_FLASHLIGHT",
+        Description = "#GM_LIMITED_FLASHLIGHT_DESC",
+        Type = "bool",
+        Default = false,
+        Flags = bit.bor(0, FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED)
+    })
+
     GAMEMODE:AddSetting("prevent_item_move", {
         Category = "SERVER",
         NiceName = "#GM_PREVENTITEMMOVE",
