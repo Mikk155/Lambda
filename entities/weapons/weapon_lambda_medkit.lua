@@ -56,6 +56,7 @@ local RECHARGE_AMOUNT = 5
 local HEAL_DELAY = 0.5
 local PLAYER_HULL_MINS = Vector(-16, -16, 0)
 local PLAYER_HULL_MAXS = Vector(16, 16, 72)
+local REVIVE_RADIUS = 64
 
 --
 -- ConVars
@@ -128,24 +129,24 @@ function SWEP:GetActorForHealing()
 end
 
 function SWEP:GetActorForReviving()
-    local ragdoll = nil
+
     local owner = self:GetOwner()
+
     local startPos = owner:GetShootPos()
-    local endPos = startPos + (owner:GetAimVector() * TRACE_LEN)
 
-    local tr = util.TraceLine({
-        start = startPos,
-        endpos = endPos,
-        filter = owner,
-        collisiongroup = COLLISION_GROUP_NONE,
-        mask = MASK_SHOT
-    })
+    local NearbyRagdolls = ents.FindInSphere( startPos, REVIVE_RADIUS )
 
-    if IsValid(tr.Entity) and tr.Entity:IsRagdoll() then
-        ragdoll = tr.Entity
+    for _, entity in ipairs( NearbyRagdolls ) do
+
+        if IsValid(entity) and entity:GetClass() == "prop_ragdoll" then
+
+            return entity
+
+        end
+
     end
 
-    return ragdoll
+    return nil
 end
 
 function SWEP:CanPrimaryAttack()
