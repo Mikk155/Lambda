@@ -62,10 +62,12 @@ function GM:EntityTakeDamage(target, dmginfo)
     local attacker = dmginfo:GetAttacker()
     local inflictor = dmginfo:GetInflictor()
     local dmgText = GetDamageTypeText(dmginfo)
-    local attackerIsPlayer = false
+    local dmgAuthor = nil
 
-    if (IsValid(attacker) and attacker:IsPlayer()) or (IsValid(inflictor) and inflictor:IsPlayer()) then
-        attackerIsPlayer = true
+    if IsValid(attacker) and attacker:IsPlayer() then
+        dmgAuthor = attacker
+    elseif IsValid(inflictor) and inflictor:IsPlayer() then
+        dmgAuthor = inflictor
     end
 
     DbgPrint("EntityTakeDamage -> Target: " .. tostring(target) .. ", Attacker: " .. tostring(attacker) .. ", Inflictor: " .. tostring(inflictor) .. ", Type: " .. dmgText)
@@ -81,12 +83,18 @@ function GM:EntityTakeDamage(target, dmginfo)
             self:ScaleNPCDamage(target, HITGROUP_GENERIC, dmginfo)
         end
 
-        if attackerIsPlayer == true and self:IsNPCMissionCritical(target) and self:GetSetting("allow_npcdmg") == false then
-            DbgPrint("Filtering damage on restricted NPC")
-            dmginfo:SetDamage(0)
+        if IsValid(dmgAuthor) and self:GetSetting("allow_npcdmg") == false then
 
-            return true
+            local table = target:Disposition(dmgAuthor)
+
+            if table ~= nil and table == D_LI then
+                DbgPrint("Filtering damage on Ally NPC")
+                dmginfo:SetDamage(0)
+                return true
+            end
+
         end
+
     elseif target:IsPlayer() then
         if target:IsPositionLocked() or target:IsInactive() == true then return true end
 
