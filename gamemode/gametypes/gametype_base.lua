@@ -381,6 +381,32 @@ function GAMETYPE:InitSettings()
         Flags = bit.bor(0, FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED)
     })
 
+    GAMEMODE:AddSetting("player_max_health", {
+        Category = "SERVER",
+        NiceName = "#GM_PLAYER_MAX_HEALTH",
+        Description = "#GM_PLAYER_MAX_HEALTH_DESC",
+        Type = "int",
+        Default = 100,
+        Flags = bit.bor(0, FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED),
+        Clamp = {
+            Min = 0,
+            Max = 900
+        }
+    })
+
+    GAMEMODE:AddSetting("player_max_armor", {
+        Category = "SERVER",
+        NiceName = "#GM_PLAYER_MAX_ARMOR",
+        Description = "#GM_PLAYER_MAX_ARMOR_DESC",
+        Type = "int",
+        Default = 100,
+        Flags = bit.bor(0, FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED),
+        Clamp = {
+            Min = 0,
+            Max = 900
+        }
+    })
+
     GAMEMODE:AddSetting("limitedflashlight", {
         Category = "SERVER",
         NiceName = "#GM_LIMITED_FLASHLIGHT",
@@ -444,11 +470,11 @@ function GAMETYPE:InitSettings()
         NiceName = "#GM_RESTARTTIME",
         Description = "#GM_RESTARTTIME_DESC",
         Type = "int",
-        Default = 10,
+        Default = 100,
         Flags = bit.bor(0, FCVAR_ARCHIVE, FCVAR_NOTIFY, FCVAR_REPLICATED),
         Clamp = {
             Min = 0,
-            Max = 600
+            Max = 900
         }
     })
 

@@ -424,6 +424,34 @@ if SERVER then
         ply:TeleportPlayer(pos, ang)
     end
 
+    function GM:PlayerCapAttributes(ply)
+
+        if IsValid( ply ) then
+
+            local max_health = self:GetSetting( "player_max_health" )
+
+            ply:SetMaxHealth( max_health )
+
+            if ply:Health() > max_health then
+                
+                ply:SetHealth( max_health )
+
+            end
+
+            local max_armor = self:GetSetting( "player_max_armor" )
+
+            ply:SetMaxArmor( max_armor )
+
+            if ply:Armor() > max_armor then
+                
+                ply:SetArmor( max_armor )
+
+            end
+
+        end
+
+    end
+
     function GM:PlayerSpawn(ply)
         DbgPrint("GM:PlayerSpawn")
         if self.WaitingForRoundStart == true or self:IsRoundRestarting() == true then
@@ -1416,6 +1444,7 @@ function GM:PlayerThink(ply)
         end
 
         self:CheckPlayerCollision(ply)
+        self:PlayerCapAttributes(ply);
     end
 end
 
