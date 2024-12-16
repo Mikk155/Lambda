@@ -83,16 +83,24 @@ function GM:EntityTakeDamage(target, dmginfo)
             self:ScaleNPCDamage(target, HITGROUP_GENERIC, dmginfo)
         end
 
-        if IsValid(dmgAuthor) and self:GetSetting("allow_npcdmg") == false then
+        if IsValid(dmgAuthor) then
 
-            local table = target:Disposition(dmgAuthor)
-
-            if table ~= nil and table == D_LI then
+            if  self:IsNPCMissionCritical(target) then
                 DbgPrint("Filtering damage on Ally NPC")
                 dmginfo:SetDamage(0)
                 return true
             end
 
+            if self:GetSetting("allow_npcdmg") == false then
+
+                local table = target:Disposition(dmgAuthor)
+
+                if table ~= nil and table == D_LI then
+                    DbgPrint("Filtering damage on Ally NPC")
+                    dmginfo:SetDamage(0)
+                    return true
+                end
+            end
         end
 
     elseif target:IsPlayer() then
