@@ -1,5 +1,9 @@
 ![Lambda](https://github.com/ZehMatt/Lambda/blob/develop/logo.png?raw=true)
 
+---
+
+<details><summary>Upstream repository</summary><p>
+
 Have you ever wanted to play the Half-Life 2 series with your friends online? Then Lambda is exactly what you are looking for. Lambda aims to provide seamless multiplayer support for the Half-Life 2 campaign maps, as well as user-created campaigns.
 
 ## Features
@@ -48,3 +52,34 @@ This is the Lambda code repository, for more information you can use following l
 
 [Steam Workshop](http://steamcommunity.com/sharedfiles/filedetails/?id=780244493)  
 [Discord](https://discord.gg/K42JUbC)
+
+</p></details>
+
+---
+
+<details><summary>This fork</summary><p>
+
+### Scope
+This is going to be a modification that aims for a "Hardcore Survival Anti-Rush"
+
+This fork is not necesarly going for a 1:1 experience with the Half-Life series.
+
+Any recomendation or issues that you think should be in the base Lambda please redirect them to the upstream repository.
+
+Features or new implementations that could be "Fun" to play with are more than welcome.
+
+### Install
+
+```bat
+cd C:\..\..\GarrysMod\garrysmod\gamemodes
+```
+
+```bat
+git clone https://github.com/Mikk155/Lambda lambda
+```
+
+[Discord](https://discord.gg/2ErNUQh6fE)
+
+</p></details>
+
+---
