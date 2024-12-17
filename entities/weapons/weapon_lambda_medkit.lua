@@ -61,7 +61,7 @@ local RECHARGE_TARGET = 100
 local HEAL_DELAY = 0.5
 local PLAYER_HULL_MINS = Vector(-16, -16, 0)
 local PLAYER_HULL_MAXS = Vector(16, 16, 72)
--- local REVIVE_RADIUS = 64
+local REVIVE_RADIUS = 64
 local CUSTOM_MAT_NAME = "LambdaMedKitMat" .. math.random(1, 1000)
 
 --
@@ -178,7 +178,6 @@ function SWEP:GetActorForReviving()
 
     local startPos = owner:GetShootPos()
 
---[[
     local NearbyRagdolls = ents.FindInSphere( startPos, REVIVE_RADIUS )
 
     for _, entity in ipairs( NearbyRagdolls ) do
@@ -190,20 +189,6 @@ function SWEP:GetActorForReviving()
         end
 
     end
-]]--
-
-    local endPos = startPos + (owner:GetAimVector() * TRACE_LEN)
-
-    local tr = util.TraceHull({
-        start = startPos,
-        endpos = endPos,
-        mins = TRACE_HULL_MINS,
-        maxs = TRACE_HULL_MAXS,
-        mask = MASK_SHOT_HULL,
-        filter = owner
-    })
-
-    if tr.Hit == true and IsValid(tr.Entity) and (tr.Entity:IsPlayer() or tr.Entity:IsNPC()) then return tr.Entity end
 
     return nil
 end
