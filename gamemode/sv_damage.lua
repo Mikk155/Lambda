@@ -106,6 +106,11 @@ function GM:EntityTakeDamage(target, dmginfo)
     elseif target:IsPlayer() then
         if target:IsPositionLocked() or target:IsInactive() == true then return true end
 
+        if IsValid(inflictor) and inflictor:GetClass() == "prop_physics" and dmginfo:GetDamage() <= 15 then
+            dmginfo:SetDamage(0)
+            return true -- Workaround for not instantly dying by props x[
+        end
+    
         if target ~= attacker and target ~= inflictor then
             if self:CallGameTypeFunc("PlayerShouldTakeDamage", target, attacker, inflictor) == false then return true end
         end
