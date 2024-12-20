@@ -585,6 +585,7 @@ function GAMETYPE:InitSettings()
             Max = 100,
         }
     })
+
 end
 
 function GAMETYPE:GetScoreboardInfo()
