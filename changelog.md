@@ -1,4 +1,9 @@
-0.9.27 (in development)
+0.9.28 (in development)
+- Fixed: d2_prison_05: Not removing default spawn items.
+- Fixed: d3_c17_07: Player clip blocking other players at the start of the map.
+
+0.9.27
+- Fixed: Entity inputs/outputs are parsed incorrect.
 
 0.9.26
 - Improved: Going in and out of the settings no longer clips into the player model.
