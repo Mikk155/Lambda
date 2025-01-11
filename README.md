@@ -80,6 +80,13 @@ git clone https://github.com/Mikk155/Lambda lambda
 
 [Discord](https://discord.gg/2ErNUQh6fE)
 
+### Credits
+
+Addons that have been merged into this gamemode
+| Name | Addon | Github |
+|---|---|---|
+| Sven Co-op Thirdperson Command | [3176821172](https://steamcommunity.com/sharedfiles/filedetails/?id=3176821172) | |
+
 </p></details>
 
 ---
