@@ -22,10 +22,10 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-    - name: Fetch .NET 6
+    - name: Fetch .NET 8
       run: |
         sudo apt update
-        sudo apt install dotnet6
+        sudo apt install dotnet8
     - name: Fetch DepotDownloader
       run: |
         wget https://github.com/SteamRE/DepotDownloader/releases/download/DepotDownloader_2.7.4/DepotDownloader-linux-x64.zip
