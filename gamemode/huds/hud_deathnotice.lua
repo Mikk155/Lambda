@@ -251,7 +251,7 @@ local function DrawDeathEntry(bounds, y, data, margin, remaining)
     end
 
     x = x - killiconHalf - killiconOffset
-    killicon.Draw(x, y, data.icon, alpha)
+    killicon.Render(x - killiconHalf, y, data.icon, alpha)
     x = x - killiconHalf - killiconOffset
     x = x - margin
 
