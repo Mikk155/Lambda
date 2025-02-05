@@ -1,4 +1,5 @@
 0.9.28 (in development)
+- Improved: Better prediction handling for the Gravity Gun, should be more responsive with higher ping now.
 - Fixed: d2_prison_05: Not removing default spawn items.
 - Fixed: d3_c17_07: Player clip blocking other players at the start of the map.
 - Fixed: d2_coast_10: Fade to black when jumping into the water.
