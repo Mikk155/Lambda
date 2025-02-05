@@ -25,7 +25,9 @@ MAPSCRIPT.InputFilters = {}
 MAPSCRIPT.EntityFilterByClass = {}
 
 MAPSCRIPT.EntityFilterByName = {
-    ["player_spawn_items"] = true
+    ["player_spawn_items"] = true,
+    ["fall_trigger"] = true,
+    ["train_pusher"] = true,
 }
 
 MAPSCRIPT.VehicleGuns = true
@@ -51,6 +53,18 @@ function MAPSCRIPT:PostInit()
                 ent:Remove()
             end)
         end
+
+        -- Better kill trigger, players would be stuck otherwise.
+        local killTrigger1 = ents.Create("trigger_hurt")
+        killTrigger1:SetupTrigger(
+            Vector(0, 1180, 50),
+            Angle(0, 0, 0),
+            Vector(-8500, -8500, -180),
+            Vector(8500, 8500, 180)
+        )
+        killTrigger1:SetKeyValue("damagetype", "32")
+        killTrigger1:SetKeyValue("damage", "999999")
+        killTrigger1:SetName("lambda_fall_trigger")
 
         -- -1074.218628 9386.666016 1664.031250
         local checkpoint1 = GAMEMODE:CreateCheckpoint(Vector(-1469.086060, 9136.386719, 1666.920044), Angle(0, 0, 0))

@@ -8,6 +8,8 @@
 - Fixed: ep1_c17_02b: Soft-lock when NPC in the room with Barney is killed.
 - Fixed: trigger_hurt not working for players in vehicles.
 - Fixed: Players are not drowning when in vehicles.
+- Fixed: d2_coast_07: Players getting thrown off the bridge when colliding with the train.
+- Fixed: d2_coast_07: Permanent death overlay when jumping off the cliff.
 
 0.9.27
 - Fixed: Entity inputs/outputs are parsed incorrect.
