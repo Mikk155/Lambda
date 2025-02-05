@@ -1053,6 +1053,7 @@ function SWEP:GetLightBrightness()
 end
 
 function SWEP:StopLights()
+    DbgPrint(self, "StopLights")
     if self.ProjectedTexture ~= nil and IsValid(self.ProjectedTexture) then
         self.ProjectedTexture:Remove()
         self.ProjectedTexture = nil
@@ -1064,7 +1065,6 @@ function SWEP:UpdateGlow()
     local glowMode = physcannon_glow_mode
     if glowMode == 0 then
         self:StopLights()
-
         return
     end
 
@@ -1814,6 +1814,7 @@ end
 
 function SWEP:OwnerChanged()
     self:DetachObject()
+    self:StopEffects()
 end
 
 function SWEP:FormatViewModelAttachment(vOrigin, bFrom)
@@ -2229,23 +2230,16 @@ function SWEP:StartEffects()
     self.EffectsSetup = true
 end
 
-function SWEP:StopEffects(stopSound)
+function SWEP:StopEffects()
     self:DoEffect(EFFECT_NONE)
     if SERVER then
-        if stopSound == nil then
-            stopSound = true
-        end
-
         local snd = self:GetMotorSound()
-        if stopSound == true and snd ~= nil and snd ~= NULL then
+        if snd ~= nil and snd ~= NULL then
             snd:ChangeVolume(0, 1.0)
             snd:ChangePitch(50, 1.0)
         end
     else
-        if self.ProjectedTexture ~= nil then
-            self.ProjectedTexture:Remove()
-            self.ProjectedTexture = nil
-        end
+        self:StopLights()
     end
 end
 
@@ -2266,12 +2260,8 @@ end
 function SWEP:UpdateEffects()
     local owner = self:GetOwner()
     local usingViewModel = self:ShouldDrawUsingViewModel()
-    if IsValid(owner) and owner:GetActiveWeapon() ~= self then
-        if self.ProjectedTexture ~= nil then
-            self.ProjectedTexture:Remove()
-            self.ProjectedTexture = nil
-        end
-
+    if IsValid(owner) and owner:GetActiveWeapon() ~= self or self:GetNoDraw() then
+        self:StopEffects()
         return
     end
 
