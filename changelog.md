@@ -7,6 +7,7 @@
 - Fixed: Missing changelog in F1 menu if cloned from git.
 - Fixed: ep1_c17_02b: Soft-lock when NPC in the room with Barney is killed.
 - Fixed: trigger_hurt not working for players in vehicles.
+- Fixed: Players are not drowning when in vehicles.
 
 0.9.27
 - Fixed: Entity inputs/outputs are parsed incorrect.

@@ -1288,13 +1288,19 @@ function GM:UpdateSuit(ply, mv)
     self:UpdateGeigerCounter(ply, mv)
 end
 
+local function IsHeadUnderwater(ply)
+    local eyePos = ply:EyePos()
+    local contents = util.PointContents(eyePos)
+    return bit.band( contents, CONTENTS_WATER ) ~= 0
+end
+
 local CHOKE_TIME = 1
 local WATER_HEALTH_RECHARGE_TIME = 3
 function GM:PlayerCheckDrowning(ply)
-    if not ply:Alive() or not ply:IsSuitEquipped() then return end
+    if not ply:Alive() then return end
     ply.WaterDamage = ply.WaterDamage or 0
     local curTime = CurTime()
-    if ply:WaterLevel() ~= 3 then
+    if not IsHeadUnderwater(ply) then
         if ply.IsDrowning == true then ply.IsDrowning = false end
         if ply.WaterDamage > 0 then
             ply.NextWaterHealthTime = ply.NextWaterHealthTime or curTime + WATER_HEALTH_RECHARGE_TIME
