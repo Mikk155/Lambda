@@ -12,6 +12,7 @@
 - Fixed: d2_coast_07: Players getting thrown off the bridge when colliding with the train.
 - Fixed: d2_coast_07: Permanent death overlay when jumping off the cliff.
 - Fixed: Gravity gun still emitting light when holstered.
+- Fixed: d3_citadel_05: PODs colliding with each other at the map start causing the game to freeze.
 
 0.9.27
 - Fixed: Entity inputs/outputs are parsed incorrect.
