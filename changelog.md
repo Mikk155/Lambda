@@ -14,6 +14,7 @@
 - Fixed: d2_coast_07: Permanent death overlay when jumping off the cliff.
 - Fixed: Gravity gun still emitting light when holstered.
 - Fixed: d3_citadel_05: PODs colliding with each other at the map start causing the game to freeze.
+- Fixed: Level transition can carry some unwanted entities to the next map.
 
 0.9.27
 - Fixed: Entity inputs/outputs are parsed incorrect.
