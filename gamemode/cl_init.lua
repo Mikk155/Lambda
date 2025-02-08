@@ -329,7 +329,8 @@ function GM:ShouldDrawLocalPlayer(ply)
     local vehicle = ply:GetVehicle()
     if vehicle ~= nil and IsValid(vehicle) then
         local class = vehicle:GetClass()
-        if class == "prop_vehicle_jeep" or class == "prop_vehicle_airboat" then
+        local shouldDrawPlayer = lambda_vehicle_drawplayer:GetBool()
+        if class == "prop_vehicle_jeep" or class == "prop_vehicle_airboat" and shouldDrawPlayer then
             ply.VehicleSteeringView = true
 
             return true

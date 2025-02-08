@@ -35,6 +35,9 @@ MAPSCRIPT.EntityFilterByName = {
 MAPSCRIPT.GlobalStates = {
     ["super_phys_gun"] = GLOBAL_OFF
 }
+MAPSCRIPT.ImportantPlayerNPCNames = {
+    ["citizen_raid_doorblocker"] = true,
+}
 
 MAPSCRIPT.Checkpoints = {
     {

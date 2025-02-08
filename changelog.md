@@ -1,10 +1,19 @@
 0.9.28 (in development)
+- Improved: Better prediction handling for the Gravity Gun, should be more responsive with higher ping now.
+- Added: Setting to draw local player in vehicles, new tab under settings menu and "lambda_vehicle_draw_player" cvar.
 - Fixed: d2_prison_05: Not removing default spawn items.
 - Fixed: d3_c17_07: Player clip blocking other players at the start of the map.
 - Fixed: d2_coast_10: Fade to black when jumping into the water.
 - Fixed: d2_prison_04: Players can get trapped in the closet where the turret is.
 - Fixed: Incorrect intro logos and credits due to mounting changes.
 - Fixed: Missing changelog in F1 menu if cloned from git.
+- Fixed: ep1_c17_02b: Soft-lock when NPC in the room with Barney is killed.
+- Fixed: trigger_hurt not working for players in vehicles.
+- Fixed: Players are not drowning when in vehicles.
+- Fixed: d2_coast_07: Players getting thrown off the bridge when colliding with the train.
+- Fixed: d2_coast_07: Permanent death overlay when jumping off the cliff.
+- Fixed: Gravity gun still emitting light when holstered.
+- Fixed: d3_citadel_05: PODs colliding with each other at the map start causing the game to freeze.
 
 0.9.27
 - Fixed: Entity inputs/outputs are parsed incorrect.

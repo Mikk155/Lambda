@@ -17,12 +17,28 @@ function PANEL:Init()
     sheetSettings:AddSheet("CROSSHAIR", PanelCrosshair)
     local PanelPostFx = sheetSettings:Add("LambdaFXPanel")
     sheetSettings:AddSheet("EFFECTS", PanelPostFx)
+    local PanelVehicle = sheetSettings:Add("LambdaVehiclePanel")
+    sheetSettings:AddSheet("VEHICLE", PanelVehicle)
     local PanelColor = sheetSettings:Add("LambdaColorPanel")
     PanelColor:SetPaintBackground(false)
     sheetSettings:AddSheet("COLORS", PanelColor)
 end
 
 vgui.Register("LambdaSettingsPanel", PANEL, "DPanel")
+
+local PANEL_VEHICLE = {}
+
+function PANEL_VEHICLE:Init()
+    -- Draw player
+    local drawPlayer = self:Add("DCheckBoxLabel")
+    drawPlayer:SetPos(5, 5)
+    drawPlayer:SetText("Draw local player")
+    drawPlayer:SetConVar("lambda_vehicle_drawplayer")
+    drawPlayer:SetValue(cvars.Number("lambda_vehicle_drawplayer"))
+end
+
+vgui.Register("LambdaVehiclePanel", PANEL_VEHICLE, "DPanel")
+
 local PANEL_CROSSHAIR = {}
 
 function PANEL_CROSSHAIR:Init()
