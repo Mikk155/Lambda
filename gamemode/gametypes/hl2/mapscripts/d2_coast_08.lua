@@ -112,7 +112,7 @@ function MAPSCRIPT:PostInit()
         ents.WaitForEntityByName("landmark_d2_coast_07-08", function(ent)
             if ent:GetClass() == "trigger_transition" then
                 ent:ResizeTriggerBox(
-                    Vector(-1060, -560, 0), 
+                    Vector(-1060, -560, 0),
                     Vector(6560, 8560, 3060)
                 )
             end
