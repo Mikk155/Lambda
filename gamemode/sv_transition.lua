@@ -204,24 +204,58 @@ function GM:SaveTransitionData(data)
 end
 
 local TRANSITION_BLACKLIST = {
-    ["keyframe_rope"] = true,
-    ["info_landmark"] = true,
-    ["env_sprite"] = true,
+    ["_firesmoke"] = true,
+    ["ai_hint"] = true,
+    ["ai_network"] = true,
+    ["env_fire"] = true,
+    ["env_fog_controller"] = true,
     ["env_lightglow"] = true,
     ["env_soundscape"] = true,
-    ["lambda_checkpoint"] = true,
-    ["move_rope"] = true,
+    ["env_soundscape_proxy"] = true,
+    ["env_soundscape_triggerable"] = true,
+    ["env_sprite"] = true,
+    ["env_sun"] = true,
+    ["env_wind"] = true,
+    ["func_brush"] = true,
+    ["func_buyzone"] = true,
+    ["func_illusionary"] = true,
+    ["func_wall"] = true,
     ["game_ragdoll_manager"] = true,
-    ["env_fog_controller"] = true,
-    ["npc_template_maker"] = true,
-    ["trigger_transition"] = true,
-    ["npc_maker"] = true,
-    ["logic_auto"] = true,
-    ["_firesmoke"] = true,
-    ["env_fire"] = true,
-    ["lambda_vehicle_tracker"] = true,
+    ["hl2mp_gamerules"] = true,
+    ["info_ladder"] = true,
+    ["info_landmark"] = true,
+    ["info_map_parameters"] = true,
+    ["info_node"] = true,
+    ["info_node_hint"] = true,
+    ["info_player_combine"] = true,
+    ["info_player_deathmatch"] = true,
+    ["info_player_rebel"] = true,
+    ["info_projecteddecal"] = true,
+    ["info_target"] = true,
+    ["infodecal"] = true,
+    ["keyframe_rope"] = true,
+    ["lambda_checkpoint"] = true,
     ["lambda_player_tracker"] = true,
-    ["npc_heli_avoidsphere"] = true
+    ["lambda_vehicle_tracker"] = true,
+    ["logic_auto"] = true,
+    ["move_rope"] = true,
+    ["npc_heli_avoidsphere"] = true,
+    ["npc_maker"] = true,
+    ["npc_template_maker"] = true,
+    ["player"] = true,
+    ["player_manager"] = true,
+    ["point_devshot_camera"] = true,
+    ["point_viewcontrol"] = true,
+    ["predicted_viewmodel"] = true,
+    ["scene_manager"] = true,
+    ["shadow_control"] = true,
+    ["sky_camera"] = true,
+    ["soundent"] = true,
+    ["team_manager"] = true,
+    ["trigger_soundscape"] = true,
+    ["trigger_transition"] = true,
+    ["viewmodel"] = true,
+    ["worldspawn"] = true,
 }
 
 local TRANSITION_ENFORCED_NPC = {
@@ -248,7 +282,10 @@ function GM:ShouldTransitionObject(obj, playersInTrigger)
         local isVehicle = obj:IsVehicle()
         local isNPC = obj:IsNPC()
 
-        if TRANSITION_BLACKLIST[class] == true then return false end
+        if TRANSITION_BLACKLIST[class] == true then
+            DbgPrint("Ignoring object for transition (Blacklisted): " .. tostring(obj))
+            return false
+        end
         if bit.band(caps, FCAP_DONT_SAVE) ~= 0 and isVehicle == false then
             DbgPrint("Ignoring object for transition (FCAP_DONT_SAVE): " .. tostring(obj))
             return false
