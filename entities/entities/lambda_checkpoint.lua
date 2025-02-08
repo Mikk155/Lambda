@@ -25,12 +25,10 @@ function ENT:Initialize()
     end
 
     self:DrawShadow(false)
-    self:Reset()
+    self:Init()
 end
 
-function ENT:Reset()
-    self:RemoveEffects(EF_NODRAW)
-    self:RemoveEFlags(EFL_DORMANT)
+function ENT:Init()
     self:AddEFlags(EFL_FORCE_CHECK_TRANSMIT + EFL_NOTIFY)
     self.Alpha = 1
     self.Dist = 0
@@ -41,6 +39,12 @@ function ENT:Reset()
     self.LastUpdate = CurTime()
     self:SetNWBool("Activated", false)
     self:Activate()
+end
+
+function ENT:Reset()
+    self:RemoveEffects(EF_NODRAW)
+    self:RemoveEFlags(EFL_DORMANT)
+    self:Init()
 end
 
 local MAT = Material("lambda/checkpoint.vmt")
