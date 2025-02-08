@@ -1,5 +1,7 @@
 0.9.28 (in development)
 - Improved: Better prediction handling for the Gravity Gun, should be more responsive with higher ping now.
+- Improved: d2_coast_08: Add more checkpoints.
+- Improved: d2_coast_08: If the Gunship is not destroyed it will transition to d2_coast_07.
 - Added: Setting to draw local player in vehicles, new tab under settings menu and "lambda_vehicle_draw_player" cvar.
 - Fixed: d2_prison_05: Not removing default spawn items.
 - Fixed: d3_c17_07: Player clip blocking other players at the start of the map.
@@ -15,6 +17,7 @@
 - Fixed: Gravity gun still emitting light when holstered.
 - Fixed: d3_citadel_05: PODs colliding with each other at the map start causing the game to freeze.
 - Fixed: Level transition can carry some unwanted entities to the next map.
+- Fixed: d2_coast_08: Incorrect player spawn when directly starting from this map.
 
 0.9.27
 - Fixed: Entity inputs/outputs are parsed incorrect.

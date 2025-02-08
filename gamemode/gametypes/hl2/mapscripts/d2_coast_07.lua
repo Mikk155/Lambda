@@ -52,6 +52,11 @@ function MAPSCRIPT:PostInit()
             ents.WaitForEntityByName("bridge_field_01", function(ent)
                 ent:Remove()
             end)
+
+            -- In case the gunship made it over set it to the right track which fails for some reason.
+            ents.WaitForEntityByName("gunship", function(ent)
+                ent:Fire("SetTrack", "path_a_22")
+            end)
         end
 
         -- Better kill trigger, players would be stuck otherwise.
