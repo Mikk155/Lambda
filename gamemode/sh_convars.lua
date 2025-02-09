@@ -50,6 +50,7 @@ if CLIENT then
     lambda_gore = GM:RegisterConVar("gore", "1", bit.bor(0, FCVAR_ARCHIVE, FCVAR_USERINFO), "Enable gore")
     lambda_language = GM:RegisterConVar("language", "english", bit.bor(0, FCVAR_ARCHIVE), "Gamemode language")
     lambda_voice_group = GM:RegisterConVar("voice_group", "auto", bit.bor(0, FCVAR_ARCHIVE, FCVAR_USERINFO), "Voice group")
+    lambda_vehicle_drawplayer = GM:RegisterConVar("vehicle_drawplayer", "1", bit.bor(0, FCVAR_ARCHIVE), "Draw player in vehicle")
 end
 
 -- Server --

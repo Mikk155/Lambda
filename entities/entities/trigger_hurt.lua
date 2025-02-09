@@ -240,6 +240,14 @@ function ENT:HurtEntity(ent, amount)
     if not IsValid(ent) then return false end
     if self:PassesTriggerFilters(ent) == false then return false end
 
+    -- Workaround for players not taking any damage in vehicles.
+    local damageType = self.DamageType
+    local inflictor = self
+    local attacker = self
+    if ent:IsPlayer() and ent:InVehicle() then
+        ent = ent:GetVehicle()
+    end
+
     if self.Damage < 0 then
         ent:SetHealth(ent:GetHealth() - (-self.Damage))
     else
@@ -247,9 +255,9 @@ function ENT:HurtEntity(ent, amount)
         local damagePos = ent:NearestPoint(pos)
         local d = DamageInfo()
         d:SetDamage(amount)
-        d:SetDamageType(self.DamageType)
-        d:SetInflictor(self)
-        d:SetAttacker(self)
+        d:SetDamageType(damageType)
+        d:SetInflictor(inflictor)
+        d:SetAttacker(attacker)
 
         if self.NoDamageForce then
             d:SetDamageForce(Vector(0, 0, 0))

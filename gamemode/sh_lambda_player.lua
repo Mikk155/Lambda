@@ -1,4 +1,3 @@
-local util = util
 if SERVER then
     AddCSLuaFile()
     util.AddNetworkString("LambdaPlayerSettings")
@@ -16,13 +15,20 @@ local ents = ents
 local player = player
 local IsValid = IsValid
 local table = table
+local util = util
+local bit_band =  bit.band
+local bit_bnot = bit.bnot
+local LocalPlayer = LocalPlayer
+
 DEFINE_BASECLASS("gamemode_base")
+
 local SUIT_DEVICE_BREATHER = 1
 local SUIT_DEVICE_SPRINT = 2
 local sv_infinite_aux_power = GetConVar("sv_infinite_aux_power")
 -- We use this constant for kickback from the back.
 local HITGROUP_HEAD_BACK = 100
 local HITGROUP_BACK = 101
+
 if SERVER then
     function GM:IsPlayerEnemy(ply1, ply2)
         local isEnemy = self:CallGameTypeFunc("IsPlayerEnemy", ply1, ply2)
@@ -378,10 +384,10 @@ if SERVER then
             local weightA = a:GetWeight() * 3
             local weightB = b:GetWeight() * 3
             local dmgPrimaryA = GetDamageValue(ammoDataPrimaryA.npcdmg) + GetDamageValue(ammoDataPrimaryA.plydmg)
-            if bit.band(ammoDataPrimaryA.dmgtype, DMG_BUCKSHOT) ~= 0 then dmgPrimaryA = dmgPrimaryA * 4 end
+            if bit_band(ammoDataPrimaryA.dmgtype, DMG_BUCKSHOT) ~= 0 then dmgPrimaryA = dmgPrimaryA * 4 end
             local dmgSecondaryA = GetDamageValue(ammoDataSecondaryA.npcdmg) + GetDamageValue(ammoDataSecondaryA.plydmg)
             local dmgPrimaryB = GetDamageValue(ammoDataPrimaryB.npcdmg) + GetDamageValue(ammoDataPrimaryB.plydmg)
-            if bit.band(ammoDataPrimaryB.dmgtype, DMG_BUCKSHOT) ~= 0 then dmgPrimaryB = dmgPrimaryB * 4 end
+            if bit_band(ammoDataPrimaryB.dmgtype, DMG_BUCKSHOT) ~= 0 then dmgPrimaryB = dmgPrimaryB * 4 end
             local dmgSecondaryB = GetDamageValue(ammoDataSecondaryB.npcdmg) + GetDamageValue(ammoDataSecondaryB.plydmg)
             local ammoCountPrimaryA = ply:GetAmmoCount(a:GetPrimaryAmmoType())
             local ammoCountSecondaryA = ply:GetAmmoCount(a:GetSecondaryAmmoType())
@@ -613,9 +619,12 @@ if SERVER then
         end
 
         ply.IsCurrentlySpawning = false
+
         -- Notify the player to start the gamemode in multiplayer to avoid any possible gamemode issues.
         if game.SinglePlayer() == true then
-            timer.Create("SPNotify", 2, 10, function() PrintMessage(HUD_PRINTCENTER, "You are in Singleplayer mode. For a better playing experience start Lambda in Multiplayer.") end)
+            timer.Create("SPNotify", 2, 10, function()
+                PrintMessage(HUD_PRINTCENTER, "You are in Singleplayer mode. For a better playing experience start Lambda in Multiplayer.")
+            end)
             PrintMessage(HUD_PRINTTALK, "You are in Singleplayer mode. For a better playing experience start Lambda in Multiplayer.")
         end
     end
@@ -948,12 +957,14 @@ end
 
 local GEIGER_DELAY = 0.25
 local GEIGER_SOUND_DELAY = 0.06
+
 function GM:UpdateGeigerCounter(ply, mv)
     local curTime = CurTime()
+    local plyTab = ply:GetTable()
     if SERVER then
-        ply.GeigerDelay = ply.GeigerDelay or curTime
-        if curTime < ply.GeigerDelay then return end
-        ply.GeigerDelay = curTime + GEIGER_DELAY
+        plyTab.GeigerDelay = ply.GeigerDelay or curTime
+        if curTime < plyTab.GeigerDelay then return end
+        plyTab.GeigerDelay = curTime + GEIGER_DELAY
         local range = math.Clamp(math.floor(ply:GetNearestRadiationRange() / 4), 0, 255)
         if ply:InVehicle() then range = math.Clamp(range * 4, 0, 1000) end
         local randChance = math.random(0, 5)
@@ -965,9 +976,9 @@ function GM:UpdateGeigerCounter(ply, mv)
         end
     else
         if ply:Alive() == false or ply ~= LocalPlayer() then return end
-        ply.GeigerSoundDelay = ply.GeigerSoundDelay or curTime
-        if curTime < ply.GeigerSoundDelay then return end
-        ply.GeigerSoundDelay = curTime + GEIGER_SOUND_DELAY
+        plyTab.GeigerSoundDelay = plyTab.GeigerSoundDelay or curTime
+        if curTime < plyTab.GeigerSoundDelay then return end
+        plyTab.GeigerSoundDelay = curTime + GEIGER_SOUND_DELAY
         local range = ply:GetGeigerRange() * 4
         --DbgPrint(range)
         if range == 0 or range >= 1000 then return end
@@ -1113,17 +1124,26 @@ function GM:StartCommand(ply, cmd)
     if ply:GetMoveType() == MOVETYPE_NOCLIP and ply:WaterLevel() == 0 then ply:RemoveFlags(FL_INWATER) end
     if CLIENT then
         if cmd:KeyDown(IN_SCORE) then
-            cmd:SetButtons(bit.band(cmd:GetButtons(), bit.bnot(IN_ATTACK)))
-            cmd:SetButtons(bit.band(cmd:GetButtons(), bit.bnot(IN_ATTACK2)))
+            cmd:SetButtons(bit_band(cmd:GetButtons(), bit_bnot(IN_ATTACK)))
+            cmd:SetButtons(bit_band(cmd:GetButtons(), bit_bnot(IN_ATTACK2)))
         end
 
-        if self:GetSetting("allow_auto_jump") == true and lambda_auto_jump:GetBool() == true then if ply:GetMoveType() == MOVETYPE_WALK and not ply:IsOnGround() and ply:WaterLevel() < 2 then cmd:SetButtons(bit.band(cmd:GetButtons(), bit.bnot(IN_JUMP))) end end
+        if self:GetSetting("allow_auto_jump") == true and lambda_auto_jump:GetBool() == true then
+            if ply:GetMoveType() == MOVETYPE_WALK and not ply:IsOnGround() and ply:WaterLevel() < 2 then
+                cmd:SetButtons(bit_band(cmd:GetButtons(), bit_bnot(IN_JUMP)))
+            end
+        end
     end
 
-    if cmd:KeyDown(IN_SPEED) == true and (ply:IsSuitEquipped() ~= true or ply:WaterLevel() > 1) and ply:InVehicle() == false then cmd:SetButtons(bit.band(cmd:GetButtons(), bit.bnot(IN_SPEED))) end
+    if cmd:KeyDown(IN_SPEED) == true and (ply:IsSuitEquipped() ~= true or ply:WaterLevel() > 1) and ply:InVehicle() == false then
+        cmd:SetButtons(bit_band(cmd:GetButtons(), bit_bnot(IN_SPEED)))
+    end
+
     -- HACKHACK: When the player is crouched and releases IN_DUCK but can't stand up it would
     -- offset the player for a short moment when pressing IN_DUCK again. We suppress this.
-    if ply:Crouching() == true and ply:KeyDown(IN_DUCK) == false and cmd:KeyDown(IN_DUCK) == true then cmd:SetButtons(bit.band(cmd:GetButtons(), bit.bnot(IN_DUCK))) end
+    if ply:Crouching() == true and ply:KeyDown(IN_DUCK) == false and cmd:KeyDown(IN_DUCK) == true then
+        cmd:SetButtons(bit_band(cmd:GetButtons(), bit_bnot(IN_DUCK)))
+    end
     ply.LastUserCmdButtons = cmd:GetButtons()
 
     -- Handle the vehicle take-over mechanic.
@@ -1134,18 +1154,19 @@ function GM:StartCommand(ply, cmd)
 end
 
 function GM:SetupMove(ply, mv, cmd)
-    --if not IsFirstTimePredicted() then return end
     if ply:Alive() == false then return end
     local isSprinting = false
     if ply.GetLambdaSprinting ~= nil then isSprinting = ply:GetLambdaSprinting() end
-    if bit.band(mv:GetButtons(), IN_JUMP) ~= 0 and bit.band(mv:GetOldButtons(), IN_JUMP) == 0 and ply:OnGround() then ply:SetIsJumping(true) end
+    if bit_band(mv:GetButtons(), IN_JUMP) ~= 0 and bit_band(mv:GetOldButtons(), IN_JUMP) == 0 and ply:OnGround() then
+        ply:SetIsJumping(true)
+    end
+
     if mv:KeyDown(IN_DUCK) and ply:IsOnGround() and isSprinting == true then
         self:PlayerEndSprinting(ply, mv)
         ply:SetLambdaStateSprinting(false)
     end
 
     if mv:KeyDown(IN_SPEED) == true then
-        --DbgPrint("Is Sprinting: " .. tostring(isSprinting))
         local canSprint = PlayerAllowSprinting(ply)
         local hasEnergy = PlayerHasSuitEnergy(ply)
         local sprintState = ply:GetLambdaStateSprinting()
@@ -1286,6 +1307,12 @@ function GM:ShouldChargeSuitPower(ply)
     return true
 end
 
+local function IsHeadUnderwater(ply)
+    local eyePos = ply:EyePos()
+    local contents = util.PointContents(eyePos)
+    return bit_band( contents, CONTENTS_WATER ) ~= 0
+end
+
 function GM:UpdateSuit(ply, mv)
     if ply:IsSuitEquipped() == false then return end
     local frameTime = FrameTime()
@@ -1300,7 +1327,7 @@ function GM:UpdateSuit(ply, mv)
             if math.abs(pos.x) > 0 or math.abs(pos.y) > 0 then powerLoad = powerLoad + SUIT_SPRINT_DRAIN end
         end
 
-        if ply:WaterLevel() >= 3 then
+        if IsHeadUnderwater(ply) then
             powerLoad = powerLoad + SUIT_BREATH_DRAIN
             ply:AddSuitDevice(SUIT_DEVICE_BREATHER)
         else
@@ -1321,46 +1348,49 @@ end
 
 local CHOKE_TIME = 1
 local WATER_HEALTH_RECHARGE_TIME = 3
+
 function GM:PlayerCheckDrowning(ply)
-    if not ply:Alive() or not ply:IsSuitEquipped() then return end
-    ply.WaterDamage = ply.WaterDamage or 0
+    if not ply:Alive() then return end
+    local plyTab = ply:GetTable()
+    plyTab.WaterDamage = plyTab.WaterDamage or 0
     local curTime = CurTime()
-    if ply:WaterLevel() ~= 3 then
-        if ply.IsDrowning == true then ply.IsDrowning = false end
-        if ply.WaterDamage > 0 then
-            ply.NextWaterHealthTime = ply.NextWaterHealthTime or curTime + WATER_HEALTH_RECHARGE_TIME
+    if not IsHeadUnderwater(ply) then
+        if plyTab.IsDrowning == true then plyTab.IsDrowning = false end
+        if plyTab.WaterDamage > 0 then
+            plyTab.NextWaterHealthTime = ply.NextWaterHealthTime or curTime + WATER_HEALTH_RECHARGE_TIME
             if ply:Health() >= 100 then
-                ply.WaterDamage = 0
+                plyTab.WaterDamage = 0
             else
-                if ply.NextWaterHealthTime < curTime then
-                    ply.WaterDamage = ply.WaterDamage - 10
+                if plyTab.NextWaterHealthTime < curTime then
+                    plyTab.WaterDamage = plyTab.WaterDamage - 10
                     if ply:Health() + 10 > 100 then
                         ply:SetHealth(100)
                     else
                         ply:SetHealth(ply:Health() + 10)
                     end
 
-                    ply.NextWaterHealthTime = curTime + WATER_HEALTH_RECHARGE_TIME
+                    plyTab.NextWaterHealthTime = curTime + WATER_HEALTH_RECHARGE_TIME
                 end
             end
         end
     else
-        ply.NextChokeTime = ply.NextChokeTime or curTime + CHOKE_TIME
-        if ply:GetLambdaSuitPower() == 0 and curTime > ply.NextChokeTime then
-            if ply.IsDrowning ~= true then
-                ply.IsDrowning = true
-                ply.DrowningStartTime = CurTime()
-                ply.WaterDamage = 0
+        plyTab.NextChokeTime = plyTab.NextChokeTime or curTime + CHOKE_TIME
+        if ply:GetLambdaSuitPower() == 0 and curTime > plyTab.NextChokeTime then
+            if plyTab.IsDrowning ~= true then
+                plyTab.IsDrowning = true
+                plyTab.DrowningStartTime = CurTime()
+                plyTab.WaterDamage = 0
             end
 
             local dmgInfo = DamageInfo()
+            local attacker = game.GetWorld()
             dmgInfo:SetDamage(10)
             dmgInfo:SetDamageType(DMG_DROWN)
-            dmgInfo:SetInflictor(game.GetWorld())
-            dmgInfo:SetAttacker(game.GetWorld())
+            dmgInfo:SetInflictor(attacker)
+            dmgInfo:SetAttacker(attacker)
             ply:TakeDamageInfo(dmgInfo)
-            ply.WaterDamage = ply.WaterDamage + 10
-            ply.NextChokeTime = curTime + CHOKE_TIME
+            plyTab.WaterDamage = plyTab.WaterDamage + 10
+            plyTab.NextChokeTime = curTime + CHOKE_TIME
         end
     end
 end
@@ -1413,9 +1443,10 @@ function GM:CheckPlayerCollision(ply)
     hullMin.y = hullMin.y * 2
     hullMax.x = hullMax.x * 2
     hullMax.y = hullMax.y * 2
+    local plyPos = ply:GetPos()
     local tr = util.TraceHull({
-        start = ply:GetPos(),
-        endpos = ply:GetPos(),
+        start = plyPos,
+        endpos = plyPos,
         filter = ply,
         mins = hullMin,
         maxs = hullMax,

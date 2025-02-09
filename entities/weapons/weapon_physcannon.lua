@@ -21,6 +21,11 @@ local ATTACHMENTS_GAPS_FP = {"fork1t", "fork2t"}
 local ATTACHMENTS_GAPS_TP = {"fork1t", "fork2t", "fork3t"}
 local ATTACHMENTS_GLOW_FP = {"fork1b", "fork1m", "fork1t", "fork2b", "fork2m", "fork2t"}
 local ATTACHMENTS_GLOW_TP = {"fork1m", "fork1t", "fork1b", "fork2m", "fork2t", "fork3m", "fork3t"}
+local PRIMARY_FIRE_DELAY = 0.6
+local SECONDARY_FIRE_DELAY = 0.5
+local SECONDARY_FIRE_PULL_DELAY = 0.1
+local SECONDARY_FIRE_DETACH_DELAY = 0.01
+
 SWEP.PrintName = "#HL2_GravityGun"
 SWEP.Author = "Zeh Matt"
 SWEP.Instructions = ""
@@ -195,7 +200,6 @@ function SWEP:Initialize()
     self.NextPuntTime = CurTime()
     self.NextGlowUpdate = CurTime()
     self.NextBeamGlow = CurTime()
-    self.OldEffectState = EFFECT_NONE
     self.GlowSprites = {}
     self.BeamSprites = {}
     self:SetElementOpen(false)
@@ -286,10 +290,16 @@ function SWEP:GetMotorSound()
     return self.SndMotor
 end
 
-function SWEP:StopLoopingSounds()
+function SWEP:StopSounds()
     if self.SndMotor ~= nil and self.SndMotor ~= NULL then
         self.SndMotor:Stop()
     end
+    self:StopSound("Weapon_MegaPhysCannon.ChargeZap")
+    self:StopSound("Weapon_PhysCannon.Pickup")
+    self:StopSound("Weapon_PhysCannon.TooHeavy")
+    self:StopSound("Weapon_PhysCannon.OpenClaws")
+    self:StopSound("Weapon_PhysCannon.CloseClaws")
+    self:StopSound("Weapon_PhysCannon.Drop")
 end
 
 function SWEP:IsObjectAttached()
@@ -303,7 +313,7 @@ end
 function SWEP:OnRemove()
     DbgPrint(self, "OnRemove")
     self:StopEffects()
-    self:StopLoopingSounds()
+    self:StopSounds()
     self:DetachObject()
     if SERVER then
         local motionController = self:GetMotionController()
@@ -342,13 +352,14 @@ function SWEP:AcceptInput(inputName, activator, callee, data)
 end
 
 function SWEP:LaunchObject(ent, fwd, force)
+    DbgPrint(self, "LaunchObject", ent, fwd, force)
     if self.LastPuntedObject == ent and CurTime() < self.NextPuntTime then return end
     self:DetachObject(true)
     self.LastPuntedObject = ent
     self.NextPuntTime = CurTime() + 0.5
     self:ApplyVelocityBasedForce(ent, fwd)
-    self:SetNextPrimaryFire(CurTime() + 0.5)
-    self:SetNextSecondaryFire(CurTime() + 0.5)
+    self:SetNextPrimaryFire(CurTime() + PRIMARY_FIRE_DELAY)
+    self:SetNextSecondaryFire(CurTime() + SECONDARY_FIRE_DELAY)
     self.ElementDebounce = CurTime() + 1.0
     self.CheckSuppressTime = CurTime() + 0.25
     self.ChangeState = ELEMENT_STATE_CLOSED
@@ -365,7 +376,9 @@ function SWEP:PrimaryAttack()
     DbgPrint(self, "PrimaryAttack")
     local owner = self:GetOwner()
     if IsValid(owner) ~= true then return end
-    self:SetNextPrimaryFire(CurTime() + 0.5)
+    --if not IsFirstTimePredicted() then return end
+
+    self:SetNextPrimaryFire(CurTime() + PRIMARY_FIRE_DELAY)
     local controller = self:GetMotionController()
     if controller:IsObjectAttached() then
         local ent = controller:GetAttachedObject()
@@ -482,8 +495,8 @@ function SWEP:SecondaryAttack()
     local controller = self:GetMotionController()
     local owner = self:GetOwner()
     if controller:IsObjectAttached() == true then
-        self:SetNextPrimaryFire(CurTime() + 0.5)
-        self:SetNextSecondaryFire(CurTime() + 0.5)
+        self:SetNextPrimaryFire(CurTime() + PRIMARY_FIRE_DELAY)
+        self:SetNextSecondaryFire(CurTime() + SECONDARY_FIRE_DELAY)
         self.Secondary.Automatic = true
         self:DetachObject(false)
         self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
@@ -497,28 +510,28 @@ function SWEP:SecondaryAttack()
             self:SendWeaponAnim(ACT_VM_PRIMARYATTACK)
             owner:SetAnimation(PLAYER_ATTACK1)
             self:WeaponSound("Weapon_PhysCannon.Pickup")
-            self:SetNextSecondaryFire(CurTime() + 0.5)
-            self:SetNextPrimaryFire(CurTime() + 0.5)
+            self:SetNextPrimaryFire(CurTime() + 0.25)
+            self:SetNextSecondaryFire(CurTime() + SECONDARY_FIRE_DELAY)
             self:DoEffect(EFFECT_HOLDING)
             self:OpenElements()
         elseif res == OBJECT_NOT_FOUND then
-            self:SetNextSecondaryFire(CurTime() + 0.4)
-            self:SetNextPrimaryFire(CurTime() + 0.4)
+            self:SetNextPrimaryFire(CurTime() + PRIMARY_FIRE_DELAY)
+            self:SetNextSecondaryFire(CurTime() + SECONDARY_FIRE_DELAY)
             self.Secondary.Automatic = true
             self:CloseElements()
             self:DoEffect(EFFECT_READY)
             self:SetNextIdleTime(CurTime() + 0.2)
         elseif res == OBJECT_BEING_PULLED then
-            self:SetNextSecondaryFire(CurTime() + 0.1)
-            self:SetNextPrimaryFire(CurTime() + 0.1)
+            self:SetNextPrimaryFire(CurTime() + PRIMARY_FIRE_DELAY)
+            self:SetNextSecondaryFire(CurTime() + SECONDARY_FIRE_PULL_DELAY)
             self.Secondary.Automatic = true
             self:OpenElementsHalf()
             self:DoEffect(EFFECT_PULLING)
             self:SetNextIdleTime(CurTime() + 0.2)
             self.ElementDebounce = CurTime() + 0.2
         elseif res == OBJECT_BEING_DETACHED then
-            self:SetNextSecondaryFire(CurTime() + 0.01)
-            self:SetNextPrimaryFire(CurTime() + 0.4)
+            self:SetNextPrimaryFire(CurTime() + PRIMARY_FIRE_DELAY)
+            self:SetNextSecondaryFire(CurTime() + SECONDARY_FIRE_DETACH_DELAY)
             self.Secondary.Automatic = true
             self:DoEffect(EFFECT_HOLDING)
         end
@@ -1035,7 +1048,7 @@ function SWEP:GetLightPosition()
 end
 
 function SWEP:GetLightBrightness()
-    local brightness
+    local brightness = 0
     if self:IsMegaPhysCannon() == true then
         brightness = 1.3
     else
@@ -1053,6 +1066,7 @@ function SWEP:GetLightBrightness()
 end
 
 function SWEP:StopLights()
+    --DbgPrint(self, "StopLights")
     if self.ProjectedTexture ~= nil and IsValid(self.ProjectedTexture) then
         self.ProjectedTexture:Remove()
         self.ProjectedTexture = nil
@@ -1064,7 +1078,6 @@ function SWEP:UpdateGlow()
     local glowMode = physcannon_glow_mode
     if glowMode == 0 then
         self:StopLights()
-
         return
     end
 
@@ -1089,6 +1102,13 @@ function SWEP:ThinkHook()
     end
 end
 
+function SWEP:UpdateEffectState()
+    local effectState = self:GetEffectState()
+    if effectState ~= self.CurrentEffect and effectState ~= EFFECT_LAUNCH then
+        self:DoEffect(effectState)
+    end
+end
+
 function SWEP:Think()
     local controller = self:GetMotionController()
     if CLIENT then
@@ -1098,11 +1118,7 @@ function SWEP:Think()
             controller:ManagePredictedObject()
         end
 
-        local effectState = self:GetEffectState()
-        if effectState ~= self.OldEffectState then
-            self:DoEffect(effectState)
-        end
-
+        self:UpdateEffectState()
         self:UpdateElementPosition()
         self:StartEffects()
     end
@@ -1325,7 +1341,9 @@ end
 function SWEP:PrimaryFireEffect()
     local owner = self:GetOwner()
     if IsValid(owner) ~= true then return end
-    owner:ViewPunch(Angle(-6, util.SharedRandom("physcannonfire", -2, 2), 0))
+    if IsFirstTimePredicted() then
+        owner:ViewPunch(Angle(-6, util.SharedRandom("physcannonfire", -2, 2), 0))
+    end
     self:EmitSound("Weapon_PhysCannon.Launch")
 end
 
@@ -1347,10 +1365,11 @@ function SWEP:PuntNonVPhysics(ent, fwd, tr)
         dmgInfo:SetDamageForce(fwd)
         dmgInfo:SetDamagePosition(tr.HitPos)
         ent:DispatchTraceAttack(dmgInfo, tr, fwd)
-        self:DoEffect(EFFECT_LAUNCH, tr.HitPos, tr.MatType, tr.HitNormal)
-        self:SetNextIdleTime(CurTime() + 0.2)
         ent:SetPhysicsAttacker(self:GetOwner())
     end
+
+    self:DoEffect(EFFECT_LAUNCH, tr.HitPos, tr.MatType, tr.HitNormal)
+    self:SetNextIdleTime(CurTime() + 0.2)
 
     self:PrimaryFireEffect()
     self:SendWeaponAnim(ACT_VM_SECONDARYATTACK)
@@ -1447,8 +1466,8 @@ function SWEP:PuntVPhysics(ent, fwd, tr)
     self.CheckSuppressTime = CurTime() + 0.25
     self:DoEffect(EFFECT_LAUNCH, tr.HitPos, tr.MatType, tr.HitNormal)
     self:SetNextIdleTime(CurTime() + 0.2)
-    self:SetNextPrimaryFire(CurTime() + 0.5)
-    self:SetNextSecondaryFire(CurTime() + 0.5)
+    self:SetNextPrimaryFire(CurTime() + PRIMARY_FIRE_DELAY)
+    self:SetNextSecondaryFire(CurTime() + SECONDARY_FIRE_DELAY)
 end
 
 function SWEP:PuntRagdoll(ent, fwd, tr)
@@ -1484,8 +1503,8 @@ function SWEP:PuntRagdoll(ent, fwd, tr)
     self.CheckSuppressTime = CurTime() + 0.25
     self:DoEffect(EFFECT_LAUNCH, tr.HitPos, tr.MatType, tr.HitNormal)
     self:SetNextIdleTime(CurTime() + 0.2)
-    self:SetNextPrimaryFire(CurTime() + 0.5)
-    self:SetNextSecondaryFire(CurTime() + 0.5)
+    self:SetNextPrimaryFire(CurTime() + PRIMARY_FIRE_DELAY)
+    self:SetNextSecondaryFire(CurTime() + SECONDARY_FIRE_DELAY)
 end
 
 function SWEP:DoEffectNone(pos)
@@ -1681,15 +1700,12 @@ function SWEP:DoEffectLaunch(pos, matType, normal)
         matType = 0
     end
 
-    shotDir:Normalize()
-    local ef = EffectData()
-    ef:SetOrigin(endPos)
-    ef:SetEntity(self)
-    ef:SetMaterialIndex(matType)
-    ef:SetNormal(normal)
-    if CLIENT and IsFirstTimePredicted() then
-        util.Effect("lambda_physcannon_impact", ef)
-    elseif SERVER then
+    if IsFirstTimePredicted() then
+        local ef = EffectData()
+        ef:SetOrigin(endPos)
+        ef:SetEntity(self)
+        ef:SetMaterialIndex(matType)
+        ef:SetNormal(normal)
         util.Effect("lambda_physcannon_impact", ef)
     end
 
@@ -1728,10 +1744,11 @@ local EFFECT_TABLE = {
 }
 
 function SWEP:DoEffect(effect, pos, matType, normal)
+    --ErrorNoHalt()
     if self.CurrentEffect == effect then return end
+    DbgPrint(self, "DoEffect", effect)
     if CLIENT then
         self:StartEffects()
-        self.OldEffectState = effect
     end
 
     self.CurrentEffect = effect
@@ -1739,15 +1756,18 @@ function SWEP:DoEffect(effect, pos, matType, normal)
         self:SetEffectState(effect)
     end
 
+    if self.HandlingEffect == true then
+        error("Recursive effect handling!")
+    end
+
+    self.HandlingEffect = true
     DbgPrint("Assigned Current Effect: " .. (EFFECT_NAME[effect] or "Unknown!") .. " (" .. effect .. ")")
     EFFECT_TABLE[effect](self, pos, matType, normal)
+    self.HandlingEffect = false
 end
 
 function SWEP:DrawWorldModel()
-    local effectState = self:GetEffectState(EFFECT_READY)
-    if effectState ~= self.OldEffectState then
-        self:DoEffect(effectState)
-    end
+    self:UpdateEffectState()
 
     local wepColor = self:GetWeaponColor(true)
     MAT_WORLDMDL:SetVector("$selfillumtint", wepColor)
@@ -1762,21 +1782,23 @@ function SWEP:DrawWorldModelTranslucent()
 end
 
 function SWEP:Holster(ent)
-    DbgPrint(self, "Holster")
     if not IsFirstTimePredicted() then return end
+
+    DbgPrint(self, "Holster")
     local controller = self:GetMotionController()
-    if controller:IsObjectAttached() == true then return false end
-    self:StopLoopingSounds()
-    self:StopEffects()
+    if controller:IsObjectAttached() == true then
+        return false
+    end
+
     self:DetachObject()
-    self.ShouldDrawGlow = false
+    self:StopSounds()
+    self:StopEffects()
     self:SendWeaponAnim(ACT_VM_HOLSTER)
 
     return true
 end
 
 function SWEP:Startup()
-    self.ShouldDrawGlow = true
     self:SendWeaponAnim(ACT_VM_DEPLOY)
     self:SetNextIdleTime(CurTime() + 0.1)
     if self:IsMegaPhysCannon() == true then
@@ -1791,6 +1813,7 @@ function SWEP:Startup()
     end
 
     self:DoEffect(EFFECT_READY)
+    self:SetNextIdleTime(CurTime() + 0.2)
 end
 
 function SWEP:Equip(newOwner)
@@ -1814,6 +1837,7 @@ end
 
 function SWEP:OwnerChanged()
     self:DetachObject()
+    self:StopEffects()
 end
 
 function SWEP:FormatViewModelAttachment(vOrigin, bFrom)
@@ -2213,40 +2237,22 @@ function SWEP:StartEffects()
     --DbgPrint("StartEffects")
     if SERVER then
         error("Dont call me server side")
-
         return
     end
 
     if self.EffectsSetup == true then return end
-    local effect = self.CurrentEffect
+
     local effectParams, beamParams = self:SetupEffects()
     self.EffectParameters = effectParams
     self.BeamParameters = beamParams
-    if effect ~= nil then
-        self:DoEffect(effect)
-    end
 
     self.EffectsSetup = true
 end
 
-function SWEP:StopEffects(stopSound)
+function SWEP:StopEffects()
     self:DoEffect(EFFECT_NONE)
-    if SERVER then
-        if stopSound == nil then
-            stopSound = true
-        end
-
-        local snd = self:GetMotorSound()
-        if stopSound == true and snd ~= nil and snd ~= NULL then
-            snd:ChangeVolume(0, 1.0)
-            snd:ChangePitch(50, 1.0)
-        end
-    else
-        if self.ProjectedTexture ~= nil then
-            self.ProjectedTexture:Remove()
-            self.ProjectedTexture = nil
-        end
-    end
+    self:StopLights()
+    self.EffectsSetup = false
 end
 
 function SWEP:GetWeaponColor(asVector)
@@ -2266,12 +2272,8 @@ end
 function SWEP:UpdateEffects()
     local owner = self:GetOwner()
     local usingViewModel = self:ShouldDrawUsingViewModel()
-    if IsValid(owner) and owner:GetActiveWeapon() ~= self then
-        if self.ProjectedTexture ~= nil then
-            self.ProjectedTexture:Remove()
-            self.ProjectedTexture = nil
-        end
-
+    if IsValid(owner) and owner:GetActiveWeapon() ~= self or self:GetNoDraw() then
+        self:StopEffects()
         return
     end
 
